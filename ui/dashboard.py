@@ -23,9 +23,16 @@ class DashboardApp:
         self.ram_percent_var = tk.StringVar(value="--")
         self.ram_cached_var = tk.StringVar(value="--")
 
+        self.disk_usage_var = tk.StringVar(value="--")
+        self.disk_total_var = tk.StringVar(value="--")
+        self.disk_free_var = tk.StringVar(value="--")
+        self.disk_read_var = tk.StringVar(value="--")
+        self.disk_write_var = tk.StringVar(value="--")
+
         self._build_ui()
         self.update_cpu()
         self.update_ram()
+        self.update_disk()
 
     def _build_ui(self):
         self.main_frame = ttk.Frame(self.root)
@@ -47,6 +54,12 @@ class DashboardApp:
             self.sidebar,
             text="RAM",
             command=self.show_ram
+        ).pack(fill="x", padx=10, pady=5)
+
+        ttk.Button(
+            self.sidebar,
+            text="DISK",
+            command=self.show_disk
         ).pack(fill="x", padx=10, pady=5)
 
         self.show_cpu()
@@ -79,10 +92,10 @@ class DashboardApp:
         )
         card.pack(fill="both", expand=True)
 
-        self._add_row(card, "Uso", self.usage_var, 0)
-        self._add_row(card, "Temperatura", self.temperature_var, 1)
-        self._add_row(card, "Frequência", self.frequency_var, 2)
-        self._add_row(card, "Núcleos", self.cores_var, 3)
+        self._add_row(card, "Usage", self.usage_var, 0)
+        self._add_row(card, "Temperature", self.temperature_var, 1)
+        self._add_row(card, "Frequence", self.frequency_var, 2)
+        self._add_row(card, "Cores", self.cores_var, 3)
         self._add_row(card, "Threads", self.threads_var, 4)
 
     def update_cpu(self):
@@ -114,9 +127,9 @@ class DashboardApp:
         card.pack(fill="both", expand=True)
 
         self._add_row(card, "Total", self.ram_total_var, 0)
-        self._add_row(card, "Utilizada", self.ram_used_var, 1)
-        self._add_row(card, "Disponível", self.ram_available_var, 2)
-        self._add_row(card, "Uso", self.ram_percent_var, 3)
+        self._add_row(card, "Used", self.ram_used_var, 1)
+        self._add_row(card, "Available", self.ram_available_var, 2)
+        self._add_row(card, "Usage", self.ram_percent_var, 3)
         self._add_row(card, "Cache", self.ram_cached_var, 4)
 
     def update_ram(self):
@@ -129,3 +142,37 @@ class DashboardApp:
         self.ram_cached_var.set(f"{info.cached:.2f} GB")
 
         self.root.after(250, self.update_ram)
+
+    def show_disk(self):
+        self.clear_content()
+
+        title = ttk.Label(
+            self.content,
+            text="Disk",
+            font=("Segoe UI", 20, "bold")
+        )
+        title.pack(anchor="w", pady=(10, 15))
+
+        card = ttk.Frame(
+            self.content,
+            padding=15,
+            relief="ridge"
+        )
+        card.pack(fill="both", expand=True)
+
+        self._add_row(card, "Usage", self.disk_usage_var, 0)
+        self._add_row(card, "Total", self.disk_total_var, 1)
+        self._add_row(card, "Free", self.disk_free_var, 2)
+        self._add_row(card, "Read Speed", self.disk_read_var, 3)
+        self._add_row(card, "Write Speed", self.disk_write_var, 4)
+
+    def update_disk(self):
+        info = self.monitor.get_disk_info()
+
+        self.disk_usage_var.set(f"{info.usage:.2f}%")
+        self.disk_total_var.set(f"{info.total:.2f} GB")
+        self.disk_free_var.set(f"{info.free:.2f} GB")
+        self.disk_read_var.set(f"{info.read_speed:.2f} MB/s")
+        self.disk_write_var.set(f"{info.write_speed:.2f} MB/s")
+
+        self.root.after(250, self.update_disk)
