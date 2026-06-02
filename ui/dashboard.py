@@ -35,6 +35,11 @@ class DashboardApp:
             "process": ProcessPage
         }
 
+        self.state["cpu"] = self.monitor.get_cpu_info()
+        self.state["ram"] = self.monitor.get_ram_info()
+        self.state["disk"] = self.monitor.get_disk_info()
+        self.state["network"] = self.monitor.get_network_info()
+
         self.navigate("cpu")
         self._loop()
 

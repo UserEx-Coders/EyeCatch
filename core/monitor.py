@@ -11,6 +11,7 @@ from models.process_info import ProcessInfo
 class SystemMonitor:
     def __init__(self):
         psutil.cpu_percent(interval=None)
+        
 
         disk = psutil.disk_io_counters()
         net = psutil.net_io_counters()
@@ -110,11 +111,10 @@ class SystemMonitor:
             total_received=n.bytes_recv
         )
 
-    # ---------------- PROCESS (CACHE) ----------------
     def get_processes(self, limit=25):
         now = time.time()
 
-        if now - self._last_process_update < 2:
+        if now - self._last_process_update < 15:
             return self._process_cache
 
         processes = []
@@ -131,7 +131,7 @@ class SystemMonitor:
                         pid=p.pid,
                         name=p.info["name"] or "Unknown",
                         cpu=p.cpu_percent(interval=None),
-                        memory=p.memory_percent(),
+                        memory=p.info.get("memory_percent", 0),
                         status=p.info["status"]
                     )
                 )
